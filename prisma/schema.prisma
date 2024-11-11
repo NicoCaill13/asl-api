@@ -1,0 +1,106 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Office {
+  id                Int           @id @default(autoincrement())
+  name              String
+  totalLot          Int
+  email             String        @unique
+  bankAccountNumber String
+  bankBalance       Float
+  bankAccount       bankAccount?
+  CoOwnership       CoOwnership[]
+}
+
+model bankAccount {
+  id                Int    @id @default(autoincrement())
+  balance           Float
+  bankAccountNumber String
+  officeId          Int    @unique
+  office            Office @relation(fields: [officeId], references: [id])
+}
+
+model CoOwnership {
+  id          Int    @id @default(autoincrement())
+  role        Role   @default(OWNER)
+  name        String
+  address     String
+  emailMain   String @unique
+  emailOpt    String
+  lotNumber   Int
+  bankBalance Float
+  city        String
+  zipCode     String
+  phone       String
+  Office      Office @relation(fields: [officeId], references: [id])
+  officeId    Int
+  password    String @default("asl_password")
+}
+
+model Contract {
+  id              Int       @id @default(autoincrement())
+  name            String
+  utility         String
+  invoices        Invoice[]
+  frequency       Frequency
+  lastPaymentDate DateTime?
+  amount          Float?
+  quote           Quote?    @relation("ContractQuote", fields: [quoteId], references: [id])
+  quoteId         Int?      @unique
+}
+
+model Invoice {
+  id         Int           @id @default(autoincrement())
+  range      DateTime
+  dueDate    DateTime?
+  amount     Float
+  contractId Int
+  contract   Contract      @relation(fields: [contractId], references: [id])
+  status     InvoiceStatut @default(PENDING)
+  filePath   String?
+}
+
+model Quote {
+  id          Int         @id @default(autoincrement())
+  title       String
+  description String?
+  amount      Float
+  createdAt   DateTime    @default(now())
+  filePath    String?
+  status      QuoteStatus @default(PENDING)
+  contract    Contract?   @relation("ContractQuote")
+}
+
+enum Role {
+  OWNER
+  PRESIDENT
+  VICE_PRESIDENT
+  SECRETARY
+  TREASURER
+}
+
+enum InvoiceStatut {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum Frequency {
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  YEARLY
+}
