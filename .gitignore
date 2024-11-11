@@ -1,0 +1,5 @@
+node_modules/*
+**/seders
+.env
+dist/*
+uploads/*
