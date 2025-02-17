@@ -29,4 +29,11 @@ export const contracts = [
     lastPaymentDate: '2024-01-01T12:00:00Z',
     amount: 500,
   },
+  {
+    name: 'SAUR',
+    utility: 'Maintenance des ouvrages d\'assainissement',
+    frequency: Frequency.YEARLY,
+    lastPaymentDate: '2024-01-01T12:00:00Z',
+    amount: 500,
+  },
 ];

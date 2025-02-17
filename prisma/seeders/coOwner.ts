@@ -19,6 +19,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "0670160943",
         officeId: 1,
+        acquisitionDate: new Date("2022-01-01")
     },
     {
         role: Role.OWNER,
@@ -32,6 +33,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "0670160943",
         officeId: 1,
+        acquisitionDate: new Date("2022-01-01")
     },
     {
         role: Role.OWNER,
@@ -45,6 +47,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "0670160943",
         officeId: 1,
+        acquisitionDate: new Date("2022-01-01")
     },
     {
         role: Role.OWNER,
@@ -58,6 +61,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "0670160943",
         officeId: 1,
+        acquisitionDate: new Date("2022-01-01")
     },
     {
         role: Role.OWNER,
@@ -71,6 +75,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-01-01")
     },
     {
         role: Role.OWNER,
@@ -84,6 +89,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-06-01")
     },
     {
         role: Role.VICE_PRESIDENT,
@@ -97,6 +103,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-07-01")
     },
     {
         role: Role.OWNER,
@@ -110,6 +117,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-02-01")
     },
     {
         role: Role.OWNER,
@@ -123,6 +131,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-04-01")
     },
     {
         role: Role.OWNER,
@@ -136,6 +145,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-09-01")
     },
     {
         role: Role.PRESIDENT,
@@ -149,6 +159,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-01-01")
     },
     {
         role: Role.SECRETARY,
@@ -162,6 +173,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-06-01")
     },
     {
         role: Role.TREASURER,
@@ -175,6 +187,7 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-09-01")
     },
     {
         role: Role.OWNER,
@@ -188,5 +201,6 @@ export const coOwner = [
         zipCode: "13300",
         phone: "",
         officeId: 1,
+        acquisitionDate: new Date("2023-01-01")
     },
 ];

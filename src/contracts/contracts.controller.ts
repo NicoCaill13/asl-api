@@ -21,7 +21,7 @@ import { OfficeMember } from 'src/auth/role/role.decorator';
 @ApiTags('Contracts')
 @Controller()
 export class ContractsController {
-  constructor(private readonly contractsService: ContractsService) {}
+  constructor(private readonly contractsService: ContractsService) { }
 
   @Post('contract')
   @ApiOperation({ summary: 'Create one contract' })
@@ -37,10 +37,6 @@ export class ContractsController {
 
   @Get('contracts')
   @ApiOperation({ summary: 'List all contracts' })
-  @ApiResponse({
-    status: 200,
-    description: 'The contracts list.',
-  })
   @ApiResponse({
     status: 200,
     description: 'The list of all contracts.',

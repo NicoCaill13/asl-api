@@ -35,7 +35,36 @@ import { Prisma } from '@prisma/client';
 @ApiTags('Invoices')
 @Controller()
 export class InvoicesController {
-  constructor(private readonly invoicesService: InvoicesService) {}
+  constructor(private readonly invoicesService: InvoicesService) { }
+
+
+
+  @Get("invoices")
+  @OfficeMember(true)
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List all invoices' })
+  @ApiResponse({
+    status: 200,
+    description: 'The list of all invoices.',
+  })
+  findAll() {
+    return this.invoicesService.getInvoices();
+  }
+
+  @Get('invoices/:id')
+  @ApiOperation({ summary: 'Find an invoice by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The invoice with the specified ID.',
+  })
+  @ApiNotFoundResponse({ status: 404, description: 'invoice with ID :id not found' })
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  findOne(@Param('id') id: string) {
+    return this.invoicesService.getInvoice(+id);
+  }
 
   @Post('invoice')
   @ApiOperation({ summary: 'Create one invoice' })
@@ -64,13 +93,13 @@ export class InvoicesController {
     return this.invoicesService.createInvoice(createInvoiceDto, file);
   }
 
-  @Get(':id/download')
-  async downloadInvoiceFile(@Param('id') id: string, @Res() res: Response) {
-    const file = await this.invoicesService.downloadInvoiceFile(+id);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="invoice-${id}.pdf"`,
-    });
-    res.send(file);
-  }
+  // @Get(':id/download')
+  // async downloadInvoiceFile(@Param('id') id: string, @Res() res: Response) {
+  //   const file = await this.invoicesService.downloadInvoiceFile(+id);
+  //   res.set({
+  //     'Content-Type': 'application/pdf',
+  //     'Content-Disposition': `attachment; filename="invoice-${id}.pdf"`,
+  //   });
+  //   res.send(file);
+  // }
 }

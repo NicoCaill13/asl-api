@@ -1,4 +1,4 @@
-export class CoOwner {}
+export class CoOwner { }
 
 import { CoOwnership } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
@@ -25,6 +25,7 @@ export interface ICoOwner {
     phone: string;
     officeId: number;
     password: string;
+    acquisitionDate: string
 }
 
 export class CoOwnerEntity implements CoOwnership {
@@ -66,6 +67,12 @@ export class CoOwnerEntity implements CoOwnership {
 
     @ApiProperty()
     password: string;
+
+    @ApiProperty()
+    acquisitionDate: Date;
+
+    @ApiProperty()
+    saleDate: Date;
 
     @ApiProperty({ required: false, type: OfficeEntity })
     Office?: OfficeEntity;

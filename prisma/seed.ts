@@ -42,6 +42,8 @@ async function main() {
         phone: element.phone,
         officeId: element.officeId,
         password: passwordDefault,
+        acquisitionDate: element.acquisitionDate
+
       },
     });
   }

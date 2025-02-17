@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsDate, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsDate, IsEnum, IsInt } from 'class-validator';
 import { InvoiceStatut } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -32,4 +32,17 @@ export class CreateInvoiceDto {
   @ApiProperty()
   @IsEnum(InvoiceStatut)
   status?: InvoiceStatut;
+
+
+  @IsOptional()
+  @ApiProperty()
+  @IsNumber()
+  @Type(() => Number)
+  year?: number;
+
+  @IsInt()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Type(() => Number)
+  officeId: number;
 }

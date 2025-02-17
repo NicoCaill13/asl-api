@@ -17,6 +17,7 @@ model Office {
   bankBalance       Float
   bankAccount       bankAccount?
   CoOwnership       CoOwnership[]
+  Invoices          Invoice[]
 }
 
 model bankAccount {
@@ -28,20 +29,22 @@ model bankAccount {
 }
 
 model CoOwnership {
-  id          Int    @id @default(autoincrement())
-  role        Role   @default(OWNER)
-  name        String
-  address     String
-  emailMain   String @unique
-  emailOpt    String
-  lotNumber   Int
-  bankBalance Float
-  city        String
-  zipCode     String
-  phone       String
-  Office      Office @relation(fields: [officeId], references: [id])
-  officeId    Int
-  password    String @default("asl_password")
+  id              Int       @id @default(autoincrement())
+  role            Role      @default(OWNER)
+  name            String
+  address         String
+  emailMain       String    @unique
+  emailOpt        String
+  lotNumber       Int
+  bankBalance     Float
+  city            String
+  zipCode         String
+  phone           String
+  Office          Office    @relation(fields: [officeId], references: [id])
+  officeId        Int
+  password        String    @default("asl_password")
+  acquisitionDate DateTime
+  saleDate        DateTime?
 }
 
 model Contract {
@@ -60,11 +63,15 @@ model Invoice {
   id         Int           @id @default(autoincrement())
   range      DateTime
   dueDate    DateTime?
+  year       Int?
   amount     Float
   contractId Int
   contract   Contract      @relation(fields: [contractId], references: [id])
   status     InvoiceStatut @default(PENDING)
-  filePath   String?
+  Office     Office        @relation(fields: [officeId], references: [id])
+  officeId   Int
+
+  filePath String?
 }
 
 model Quote {
