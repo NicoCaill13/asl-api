@@ -1,4 +1,6 @@
 import { HttpStatus, Module } from '@nestjs/common';
+
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -17,6 +19,7 @@ import { QuotesService } from './quotes/quotes.service';
 import { QuotesModule } from './quotes/quotes.module';
 import { FileUploadModule } from './utils/file-upload.module';
 import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
+import { ConvocationsModule } from './convocations/convocations.module';
 
 @Module({
   imports: [
@@ -29,6 +32,7 @@ import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
     ContractsModule,
     QuotesModule,
     FileUploadModule,
+    ConvocationsModule,
   ],
   controllers: [AppController, InvoicesController, ContractsController, QuotesController],
   providers: [

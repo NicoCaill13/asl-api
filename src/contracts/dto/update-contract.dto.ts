@@ -1,5 +1,6 @@
-import { IsOptional, IsString, IsInt } from 'class-validator';
+import { IsOptional, IsString, IsInt, IsNumber, IsDate, IsEnum } from 'class-validator';
 import { Frequency } from '@prisma/client';
+import { Type } from 'class-transformer';
 
 export class UpdateContractDto {
   @IsOptional()
@@ -11,6 +12,11 @@ export class UpdateContractDto {
   utility?: string;
 
   @IsOptional()
-  @IsInt()
+  @IsEnum(Frequency)
   frequency?: Frequency;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  amount?: number;
 }

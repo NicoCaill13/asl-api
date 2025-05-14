@@ -34,6 +34,18 @@ export class OfficeMemberGuard implements CanActivate {
     }
     const request = context.switchToHttp().getRequest();
     const user = request.user;
+
+    // // Autoriser OWNER seulement sur certaines routes[]
+    const allowedForOwner = ['/invoices', '/co-owners']; // Ajout de la route /owners; //
+    const currentPath = request.route.path;
+
+    if (user.role === 'OWNER') {
+      if (allowedForOwner.includes(currentPath)) {
+        return true; // OWNER autorisé pour cette route
+      } else {
+        return false; // OWNER bloqué pour les autres routes
+      }
+    }
     const isOffice = isUserOfficeMember(user);
     return isOffice;
   }

@@ -49,6 +49,7 @@ model CoOwnership {
 
 model Contract {
   id              Int       @id @default(autoincrement())
+  filePath        String?  
   name            String
   utility         String
   invoices        Invoice[]
@@ -66,7 +67,7 @@ model Invoice {
   year       Int?
   amount     Float
   contractId Int
-  contract   Contract      @relation(fields: [contractId], references: [id])
+  contract   Contract      @relation(fields:[contractId], references:[id])
   status     InvoiceStatut @default(PENDING)
   Office     Office        @relation(fields: [officeId], references: [id])
   officeId   Int

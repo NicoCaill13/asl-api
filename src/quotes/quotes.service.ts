@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, StreamableFile } from '@nestjs/common';
+import { Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Quote, QuoteStatus } from '@prisma/client';
 import { CreateQuoteDto } from './dto/create-quote.dto';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync, readFileSync, createReadStream } from 'fs';
 import { join } from 'path';
 import { FileUploadService } from '../utils/file-upload.service';
 
@@ -44,5 +45,22 @@ export class QuotesService {
 
   async remove(id: number) {
     return this.prisma.quote.delete({ where: { id } });
+  }
+
+  async downloadQuote(filename: string, res: Response): Promise<StreamableFile> {
+    const filePath = join(process.cwd(), 'uploads', 'quotes', filename);
+
+    if (!existsSync(filePath)) {
+      throw new NotFoundException(`Fichier "${filename}" introuvable`);
+    }
+
+    // Configure ici les headers
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+    });
+
+    const fileStream = createReadStream(filePath);
+    return new StreamableFile(fileStream);
   }
 }

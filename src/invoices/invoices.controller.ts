@@ -10,6 +10,10 @@ import {
   BadRequestException,
   HttpCode,
   UseGuards,
+  Put,
+  Delete,
+  Query,
+  StreamableFile,
 } from '@nestjs/common';
 import { InvoicesService } from './invoices.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -31,15 +35,14 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OfficeMemberGuard } from 'src/auth/role/role.guard';
 import { OfficeMember } from 'src/auth/role/role.decorator';
 import { Prisma } from '@prisma/client';
+import { UpdateInvoicesStatusDto } from './dto/update-invoice.dto';
 
 @ApiTags('Invoices')
 @Controller()
 export class InvoicesController {
-  constructor(private readonly invoicesService: InvoicesService) { }
+  constructor(private readonly invoicesService: InvoicesService) {}
 
-
-
-  @Get("invoices")
+  @Get('invoices')
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   @ApiBearerAuth()
@@ -48,8 +51,11 @@ export class InvoicesController {
     status: 200,
     description: 'The list of all invoices.',
   })
-  findAll() {
-    return this.invoicesService.getInvoices();
+  findAll(
+    @Query('contractId') contractId?: string // ← on lit le query-param
+  ) {
+    const id = contractId ? parseInt(contractId, 10) : undefined;
+    return this.invoicesService.getInvoices(id);
   }
 
   @Get('invoices/:id')
@@ -64,6 +70,34 @@ export class InvoicesController {
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.invoicesService.getInvoice(+id);
+  }
+
+  @Put('invoice/:id')
+  @ApiOperation({ summary: 'Update an invoice by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+  })
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
+  @ApiNotFoundResponse({ status: 404, description: 'invoice with ID :id not found' })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden : Forbidden resource' })
+  @HttpCode(200)
+  @OfficeMember(true)
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  updateOne(@Param('id') id: string, @Body() UpdateInvoicesStatusDto: UpdateInvoicesStatusDto) {
+    return this.invoicesService.updateInvoiceStatut(+id, UpdateInvoicesStatusDto.status);
+  }
+
+  @Delete('invoice/:id')
+  @ApiOperation({ summary: 'Delete one quote' })
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden : Forbidden resource' })
+  @HttpCode(204)
+  @OfficeMember(true)
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @ApiBearerAuth()
+  remove(@Param('id') id: string) {
+    return this.invoicesService.remove(+id);
   }
 
   @Post('invoice')
@@ -91,6 +125,16 @@ export class InvoicesController {
     @UploadedFile() file: Express.Multer.File
   ) {
     return this.invoicesService.createInvoice(createInvoiceDto, file);
+  }
+
+  @Get('invoice/:filename/download/')
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @OfficeMember(true)
+  async downloadInvoices(
+    @Param('filename') filename: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<StreamableFile> {
+    return this.invoicesService.downloadInvoice(filename, res);
   }
 
   // @Get(':id/download')

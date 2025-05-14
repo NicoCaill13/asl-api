@@ -3,7 +3,7 @@ import { OfficesService } from './offices.service';
 import { CreateOfficeDto } from './dto/create-office.dto';
 import { UpdateOfficeDto } from './dto/update-office.dto';
 import { OfficeEntity } from './entities/office.entity';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OfficeMemberGuard } from 'src/auth/role/role.guard';
 import { OfficeMember } from 'src/auth/role/role.decorator';
@@ -21,6 +21,11 @@ export class OfficesController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Find all Offices' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all Offices.',
+  })
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   @ApiBearerAuth()

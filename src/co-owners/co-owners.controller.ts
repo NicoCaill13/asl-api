@@ -86,4 +86,14 @@ export class CoOwnersController {
   remove(@Param('id') id: string) {
     return this.coOwnersService.remove(+id);
   }
+
+  @Get('co-owner/emails')
+  @ApiOperation({ summary: 'Get all co-ownership main emails' })
+  @HttpCode(200)
+  @OfficeMember(true)
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @ApiBearerAuth()
+  findAllMainEmails() {
+    return this.coOwnersService.findAllMainEmails();
+  }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateCoOwnerDto } from './dto/create-co-owner.dto';
 import { UpdateCoOwnerDto } from './dto/update-co-owner.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,12 +12,20 @@ export class CoOwnersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCoOwnerDto: CreateCoOwnerDto) {
-    const hashedPassword = await bcrypt.hash(createCoOwnerDto.password, roundsOfHashing);
+    const rounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+    if (isNaN(rounds) || rounds < 4) {
+      throw new Error('Rounds de hashage invalides.');
+    }
 
-    createCoOwnerDto.password = hashedPassword;
+    const hashedPassword = await bcrypt.hash(createCoOwnerDto.password, rounds);
 
     return this.prisma.coOwnership.create({
-      data: createCoOwnerDto,
+      data: {
+        ...createCoOwnerDto,
+        password: hashedPassword,
+        acquisitionDate: new Date(createCoOwnerDto.acquisitionDate),
+        saleDate: createCoOwnerDto.saleDate ? new Date(createCoOwnerDto.saleDate) : null,
+      },
     });
   }
 
@@ -37,15 +45,41 @@ export class CoOwnersService {
     });
   }
 
-  async update(id: number, updateCoOwnerDto: UpdateCoOwnerDto) {
-    if (updateCoOwnerDto.password) {
-      updateCoOwnerDto.password = await bcrypt.hash(updateCoOwnerDto.password, roundsOfHashing);
+  async findAllMainEmails() {
+    return this.prisma.coOwnership.findMany({
+      select: {
+        id: true,
+        emailMain: true,
+        lotNumber: true,
+      },
+      where: {
+        emailMain: { not: undefined },
+      },
+    });
+  }
+
+  async update(id: number, dto: UpdateCoOwnerDto) {
+    const coOwner = await this.prisma.coOwnership.findUnique({ where: { id } });
+
+    if (!coOwner) {
+      throw new NotFoundException(`Co-owner avec l'ID ${id} introuvable.`);
     }
 
-    return this.prisma.coOwnership.update({
-      where: { id },
-      data: updateCoOwnerDto,
-    });
+    try {
+      const rounds = parseInt(process.env.HASH_ROUNDS || '10', 10);
+
+      if (dto.password) {
+        dto.password = await bcrypt.hash(dto.password, rounds);
+      }
+
+      return await this.prisma.coOwnership.update({
+        where: { id },
+        data: dto,
+      });
+    } catch (error) {
+      console.error(' Erreur updateCoOwner:', error);
+      throw new InternalServerErrorException('Erreur lors de la mise à jour du propriétaire.');
+    }
   }
 
   remove(id: number) {

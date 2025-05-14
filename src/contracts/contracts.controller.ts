@@ -1,4 +1,23 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, HttpCode, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  HttpCode,
+  Put,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFile,
+  NotFoundException,
+  Res,
+  StreamableFile,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ContractsService } from './contracts.service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
@@ -17,11 +36,13 @@ import {
 } from '@nestjs/swagger';
 import { OfficeMemberGuard } from 'src/auth/role/role.guard';
 import { OfficeMember } from 'src/auth/role/role.decorator';
+import { join } from 'path';
+import * as fs from 'fs';
 
 @ApiTags('Contracts')
 @Controller()
 export class ContractsController {
-  constructor(private readonly contractsService: ContractsService) { }
+  constructor(private readonly contractsService: ContractsService) {}
 
   @Post('contract')
   @ApiOperation({ summary: 'Create one contract' })
@@ -31,8 +52,20 @@ export class ContractsController {
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   @ApiBearerAuth()
-  create(@Body() createContractDto: CreateContractDto) {
-    return this.contractsService.create(createContractDto);
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: (req, file, callback) => {
+        // Vérifie si le fichier est un PDF
+        if (file.mimetype === 'application/pdf') {
+          callback(null, true);
+        } else {
+          callback(new BadRequestException('Only PDF files are allowed!'), false);
+        }
+      },
+    })
+  )
+  create(@UploadedFile() file: Express.Multer.File, @Body() createContractDto: CreateContractDto) {
+    return this.contractsService.create(createContractDto, file);
   }
 
   @Get('contracts')
@@ -88,5 +121,15 @@ export class ContractsController {
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   delete(@Param('id') id: string) {
     return this.contractsService.delete(+id);
+  }
+
+  @Get('contract/:filename/download/')
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @OfficeMember(true)
+  async downloadContract(
+    @Param('filename') filename: string,
+    @Res({ passthrough: true }) res: Response
+  ): Promise<StreamableFile> {
+    return this.contractsService.downloadContract(filename, res);
   }
 }

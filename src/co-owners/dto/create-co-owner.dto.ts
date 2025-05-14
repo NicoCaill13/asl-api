@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, MinLength, IsEmail, IsNumber, IsDate, IsOptional } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, MinLength, IsEmail, IsNumber, IsDate, IsOptional, IsDateString } from 'class-validator';
 import { Role } from '../entities/co-owner.entity';
 import { Type } from 'class-transformer';
 
@@ -32,11 +32,13 @@ export class CreateCoOwnerDto {
   emailOpt: string;
 
   @IsInt()
+  @Type(() => Number)
   @IsNotEmpty()
   @ApiProperty()
   lotNumber: number;
 
   @IsNumber()
+  @Type(() => Number)
   @IsNotEmpty()
   @ApiProperty()
   bankBalance: number;
@@ -63,6 +65,7 @@ export class CreateCoOwnerDto {
 
   @IsInt()
   @IsNotEmpty()
+  @Type(() => Number)
   @ApiProperty()
   officeId: number;
 

@@ -1,7 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException, StreamableFile } from "@nestjs/common";
+import { Response } from "express";
 import { CreateOfficeDto } from "./dto/create-office.dto";
 import { UpdateOfficeDto } from "./dto/update-office.dto";
 import { PrismaService } from "../prisma/prisma.service";
+import { join } from "path";
+import { createReadStream, existsSync } from "fs";
 
 @Injectable()
 export class OfficesService {
@@ -33,4 +36,6 @@ export class OfficesService {
     remove(id: number) {
         return this.prisma.office.delete({ where: { id } });
     }
+
+   
 }

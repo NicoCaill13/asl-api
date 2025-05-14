@@ -10,7 +10,11 @@ import {
   BadRequestException,
   HttpCode,
   UseGuards,
+  Delete,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { QuotesService } from './quotes.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateQuoteDto } from './dto/create-quote.dto';
@@ -90,5 +94,24 @@ export class QuotesController {
   @HttpCode(200)
   async updateStatus(@Param('id') id: string, @Body() updateQuoteStatusDto: UpdateQuoteStatusDto) {
     return this.quotesService.updateQuoteStatus(+id, updateQuoteStatusDto.status);
+  }
+
+  @Delete('quote/:id')
+  @ApiOperation({ summary: 'Delete one quote' })
+  @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
+  @ApiForbiddenResponse({ status: 403, description: 'Forbidden : Forbidden resource' })
+  @HttpCode(204)
+  @OfficeMember(true)
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @ApiBearerAuth()
+  remove(@Param('id') id: string) {
+    return this.quotesService.remove(+id);
+  }
+
+  @Get('quote/:filename/download/')
+  @UseGuards(JwtAuthGuard, OfficeMemberGuard)
+  @OfficeMember(true)
+  async downloadQuote(@Param('filename') filename: string, @Res({ passthrough: true }) res: Response): Promise<StreamableFile> {
+    return this.quotesService.downloadQuote(filename, res);
   }
 }
