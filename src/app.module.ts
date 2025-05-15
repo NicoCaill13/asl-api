@@ -19,7 +19,7 @@ import { QuotesService } from './quotes/quotes.service';
 import { QuotesModule } from './quotes/quotes.module';
 import { FileUploadModule } from './utils/file-upload.module';
 import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
-import { ConvocationsModule } from './convocations/convocations.module';
+import { AssemblyModule } from './assembly/assembly.module';
 
 @Module({
   imports: [
@@ -27,12 +27,15 @@ import { ConvocationsModule } from './convocations/convocations.module';
     OfficesModule,
     CoOwnersModule,
     AuthModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
+    }),
     InvoicesModule,
     ContractsModule,
     QuotesModule,
     FileUploadModule,
-    ConvocationsModule,
+    AssemblyModule,
   ],
   controllers: [AppController, InvoicesController, ContractsController, QuotesController],
   providers: [
