@@ -46,6 +46,7 @@ model CoOwnership {
   acquisitionDate      DateTime
   saleDate             DateTime?
   assemblyParticipants AssemblyParticipant[]
+  fundCallPayments     FundCallPayment[]
 }
 
 model Contract {
@@ -90,9 +91,10 @@ model Quote {
 model Assembly {
   id              Int                   @id @default(autoincrement())
   date            DateTime
-  convocationFile String
-  reportFile      String
-  participants    AssemblyParticipant[] // relation vers la table de jointure
+  message         String
+  filePath        String?
+  createdAt       DateTime             @default(now())
+  participants    AssemblyParticipant[] 
 }
 
 model AssemblyParticipant {
@@ -104,6 +106,30 @@ model AssemblyParticipant {
 
   @@id([assemblyId, coOwnershipId])
 }
+
+model FundCall {
+  id              Int                   @id @default(autoincrement())
+  date            DateTime
+  amount          Float
+  payment         String
+  payments        FundCallPayment[]
+}
+
+model FundCallPayment {
+  id            Int           @id @default(autoincrement())
+  fundCall      FundCall      @relation(fields: [fundCallId], references: [id])
+  fundCallId    Int
+
+  coOwnership   CoOwnership   @relation(fields: [coOwnershipId], references: [id])
+  coOwnershipId Int
+
+  installment   Int           // 1 ou 2
+  amountPaid    Float
+  paidAt        DateTime
+
+  @@unique([fundCallId, coOwnershipId, installment]) // éviter les doublons
+}
+
 
 enum Role {
   OWNER

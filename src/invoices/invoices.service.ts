@@ -25,11 +25,48 @@ export class InvoicesService {
     });
   }
 
-  async updateInvoiceStatut(id: number, status: InvoiceStatut): Promise<Invoice> {
-    return this.prisma.invoice.update({
+  async updateInvoiceStatut(id: number, status: InvoiceStatut, amount?: number): Promise<Invoice> {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id },
+      include: {
+        contract: true,
+      },
+    });
+
+    if (!invoice) {
+      throw new NotFoundException(`Facture ID ${id} introuvable`);
+    }
+
+    const previousStatus = invoice.status;
+
+    const updatedInvoice = await this.prisma.invoice.update({
       where: { id },
       data: { status },
     });
+
+    if (status === 'PAID' && previousStatus !== 'PAID') {
+      await this.prisma.office.update({
+        where: { id: invoice.officeId },
+        data: {
+          bankBalance: {
+            decrement: amount ?? invoice.amount,
+          },
+        },
+      });
+    }
+
+    if (previousStatus === 'PAID' && status !== 'PAID') {
+      await this.prisma.office.update({
+        where: { id: invoice.officeId },
+        data: {
+          bankBalance: {
+            increment: amount ?? invoice.amount,
+          },
+        },
+      });
+    }
+
+    return updatedInvoice;
   }
 
   async remove(id: number) {

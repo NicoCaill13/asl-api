@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AssemblyController } from './assembly.controller';
-import { AssemblyService } from './assembly.service';
+import { assemblyService } from './assembly.service';
 
 describe('AssemblyController', () => {
   let controller: AssemblyController;
-  let service: AssemblyService;
+  let service: assemblyService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -12,7 +12,7 @@ describe('AssemblyController', () => {
     }).compile();
 
     controller = module.get<AssemblyController>(AssemblyController);
-    service = module.get<AssemblyService>(AssemblyService);
+    service = module.get<assemblyService>(assemblyService);
   });
   it('should be defined', () => {
     expect(controller).toBeDefined();

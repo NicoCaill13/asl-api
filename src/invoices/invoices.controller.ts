@@ -74,18 +74,15 @@ export class InvoicesController {
 
   @Put('invoice/:id')
   @ApiOperation({ summary: 'Update an invoice by id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Success',
-  })
+  @ApiResponse({ status: 200, description: 'Success' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
   @ApiNotFoundResponse({ status: 404, description: 'invoice with ID :id not found' })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden : Forbidden resource' })
   @HttpCode(200)
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
-  updateOne(@Param('id') id: string, @Body() UpdateInvoicesStatusDto: UpdateInvoicesStatusDto) {
-    return this.invoicesService.updateInvoiceStatut(+id, UpdateInvoicesStatusDto.status);
+  updateOne(@Param('id') id: string, @Body() dto: UpdateInvoicesStatusDto) {
+    return this.invoicesService.updateInvoiceStatut(+id, dto.status, dto.amount);
   }
 
   @Delete('invoice/:id')

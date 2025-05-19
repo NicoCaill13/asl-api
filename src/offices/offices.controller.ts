@@ -8,6 +8,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { OfficeMemberGuard } from 'src/auth/role/role.guard';
 import { OfficeMember } from 'src/auth/role/role.decorator';
 
+@ApiTags('Offices')
 @Controller('offices')
 export class OfficesController {
   constructor(private readonly officesService: OfficesService) {}
