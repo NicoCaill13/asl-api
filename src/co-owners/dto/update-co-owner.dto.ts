@@ -21,15 +21,14 @@ export class UpdateCoOwnerDto {
   @ApiProperty()
   emailMain: string;
 
-  @IsEmail()
-  @MinLength(2)
+  @IsOptional()
   @ApiProperty()
   emailOpt?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @ApiProperty()
-  phone: string;
+  phone?: string;
 
   @IsString()
   @IsNotEmpty()

@@ -70,7 +70,7 @@ export class SelfGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
     if (!user || !user.lotNumber || !request.params?.id) {
-      console.warn('❌ Données manquantes pour SelfGuard');
+      console.warn(' Données manquantes pour SelfGuard');
       return false;
     }
 

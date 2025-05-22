@@ -26,10 +26,11 @@ export class CreateCoOwnerDto {
   @ApiProperty()
   emailMain: string;
 
+  @IsOptional()
   @IsEmail()
   @MinLength(2)
   @ApiProperty()
-  emailOpt: string;
+  emailOpt?: string;
 
   @IsInt()
   @Type(() => Number)

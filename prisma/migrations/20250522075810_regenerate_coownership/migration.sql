@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "CoOwnership" ALTER COLUMN "emailOpt" DROP NOT NULL,
+ALTER COLUMN "phone" DROP NOT NULL;

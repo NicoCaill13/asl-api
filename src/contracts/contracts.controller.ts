@@ -96,7 +96,7 @@ export class ContractsController {
   }
 
   @Put('contract/:id')
-  @ApiOperation({ summary: 'Update an article' })
+  @ApiOperation({ summary: 'Update a contract ' })
   @ApiResponse({
     status: 200,
     description: 'The article has been successfully updated.',
@@ -112,7 +112,7 @@ export class ContractsController {
   }
 
   @Delete('contract/:id')
-  @ApiOperation({ summary: 'Delete an article' })
+  @ApiOperation({ summary: 'Delete a contract ' })
   @ApiNotFoundResponse({ status: 404, description: `Contract with ID :id not found` })
   @ApiUnauthorizedResponse({ status: 401, description: 'Unauthorized : No token provided' })
   @ApiForbiddenResponse({ status: 403, description: 'Forbidden : Forbidden resource' })

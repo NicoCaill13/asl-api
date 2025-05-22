@@ -34,18 +34,18 @@ model CoOwnership {
   name                 String
   address              String
   emailMain            String                @unique
-  emailOpt             String
+  emailOpt             String?
   lotNumber            Int
   bankBalance          Float
   city                 String
   zipCode              String
-  phone                String
+  phone                String?
   Office               Office                @relation(fields: [officeId], references: [id])
   officeId             Int
   password             String                @default("asl_password")
   acquisitionDate      DateTime
   saleDate             DateTime?
-  assemblyParticipants AssemblyParticipant[]
+  assembly             AssemblyParticipant[]
   fundCallPayments     FundCallPayment[]
 }
 
@@ -58,7 +58,7 @@ model Contract {
   frequency       Frequency
   lastPaymentDate DateTime?
   amount          Float?
-  quote           Quote?    @relation("ContractQuote", fields: [quoteId], references: [id])
+  quote           Quote?    @relation("ContractQuote", fields: [quoteId], references: [id], onDelete: Cascade)
   quoteId         Int?      @unique
 }
 
@@ -69,9 +69,9 @@ model Invoice {
   year       Int?
   amount     Float
   contractId Int
-  contract   Contract      @relation(fields: [contractId], references: [id])
+  contract   Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   status     InvoiceStatut @default(PENDING)
-  Office     Office        @relation(fields: [officeId], references: [id])
+  Office     Office        @relation(fields: [officeId], references: [id], onDelete: Cascade)
   officeId   Int
 
   filePath String?
@@ -98,36 +98,37 @@ model Assembly {
 }
 
 model AssemblyParticipant {
-  assembly   Assembly @relation(fields: [assemblyId], references: [id])
+  id            Int           @id @default(autoincrement())
+  assembly   Assembly @relation(fields: [assemblyId], references: [id], onDelete: Cascade)
   assemblyId Int
 
-  coOwnership   CoOwnership @relation(fields: [coOwnershipId], references: [id])
+  coOwnership   CoOwnership @relation(fields: [coOwnershipId], references: [id], onDelete: Cascade)
   coOwnershipId Int
 
-  @@id([assemblyId, coOwnershipId])
+ 
 }
 
 model FundCall {
   id              Int                   @id @default(autoincrement())
   date            DateTime
   amount          Float
-  payment         String
+  statut          FundCallStatut        @default(PENDING)
   payments        FundCallPayment[]
 }
 
 model FundCallPayment {
   id            Int           @id @default(autoincrement())
-  fundCall      FundCall      @relation(fields: [fundCallId], references: [id])
+  fundCall      FundCall      @relation(fields: [fundCallId], references: [id], onDelete: Cascade)
   fundCallId    Int
 
-  coOwnership   CoOwnership   @relation(fields: [coOwnershipId], references: [id])
+  coOwnership   CoOwnership   @relation(fields: [coOwnershipId], references: [id], onDelete: Cascade)
   coOwnershipId Int
 
-  installment   Int           // 1 ou 2
+  installment   Int           
   amountPaid    Float
   paidAt        DateTime
 
-  @@unique([fundCallId, coOwnershipId, installment]) // éviter les doublons
+  @@unique([fundCallId, coOwnershipId, installment]) 
 }
 
 
@@ -156,4 +157,9 @@ enum Frequency {
   QUARTERLY
   HALF_YEARLY
   YEARLY
+}
+
+enum FundCallStatut {
+  PENDING
+  PAID
 }

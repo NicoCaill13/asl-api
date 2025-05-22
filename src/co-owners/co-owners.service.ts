@@ -25,6 +25,7 @@ export class CoOwnersService {
         password: hashedPassword,
         acquisitionDate: new Date(createCoOwnerDto.acquisitionDate),
         saleDate: createCoOwnerDto.saleDate ? new Date(createCoOwnerDto.saleDate) : null,
+        emailOpt: createCoOwnerDto.emailOpt ?? null,
       },
     });
   }

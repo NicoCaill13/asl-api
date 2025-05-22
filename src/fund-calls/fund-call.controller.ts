@@ -26,7 +26,7 @@ import { SendFundCallDto } from './dto/fund-call.dto';
 export class FundCallController {
   constructor(private readonly fundCallService: FundCallService) {}
 
-  @Post('send')
+  @Post('fund-call')
   @ApiOperation({ summary: 'Créer et envoyer une convocation' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })

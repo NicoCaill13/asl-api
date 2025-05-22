@@ -11,17 +11,15 @@ export class SendAssemblyDto {
   @IsString()
   message: string;
 
+  @ApiProperty({ type: [String], description: 'Liste d’emails des participants' })
   @Transform(({ value }) => {
     try {
-      const parsed = JSON.parse(value);
-      if (!Array.isArray(parsed)) throw new Error();
-      return parsed;
+      return JSON.parse(value);
     } catch {
       return [];
     }
   })
-  @IsArray({ message: 'participants must be an array' })
-  @ArrayNotEmpty({ message: 'participants should not be empty' })
+  @IsArray()
   @IsEmail({}, { each: true })
   participants: string[];
 
