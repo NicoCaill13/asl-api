@@ -1,6 +1,7 @@
 import { IsOptional, IsString, IsInt, IsNumber, IsDate, IsEnum } from 'class-validator';
-import { Frequency } from '@prisma/client';
+import { Frequency, Utility } from '@prisma/client';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateContractDto {
   @IsOptional()
@@ -8,8 +9,9 @@ export class UpdateContractDto {
   name?: string;
 
   @IsOptional()
-  @IsString()
-  utility?: string;
+  @ApiProperty({ enum: Utility })
+  @IsEnum(Utility)
+  utility: Utility;
 
   @IsOptional()
   @IsEnum(Frequency)

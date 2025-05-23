@@ -40,7 +40,7 @@ model CoOwnership {
   city                 String
   zipCode              String
   phone                String?
-  Office               Office                @relation(fields: [officeId], references: [id])
+  Office               Office              @relation(fields: [officeId], references: [id])
   officeId             Int
   password             String                @default("asl_password")
   acquisitionDate      DateTime
@@ -53,7 +53,7 @@ model Contract {
   id              Int       @id @default(autoincrement())
   filePath        String?
   name            String
-  utility         String
+  utility         Utility   @default(ELECTRICITY)
   invoices        Invoice[]
   frequency       Frequency
   lastPaymentDate DateTime?
@@ -80,6 +80,7 @@ model Invoice {
 model Quote {
   id          Int         @id @default(autoincrement())
   title       String
+  utility     Utility     @default(ELECTRICITY)
   description String?
   amount      Float
   createdAt   DateTime    @default(now())
@@ -162,4 +163,12 @@ enum Frequency {
 enum FundCallStatut {
   PENDING
   PAID
+}
+
+enum Utility {
+  ELECTRICITY
+  WATER
+  INSURANCE
+  MAINTENANCE
+  GREEN_SPACE
 }

@@ -108,6 +108,7 @@ export class ContractsController {
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   update(@Param('id') id: string, @Body() updateContractDto: UpdateContractDto) {
+    console.log('––– DTO reçu dans update:', updateContractDto);
     return this.contractsService.update(+id, updateContractDto);
   }
 

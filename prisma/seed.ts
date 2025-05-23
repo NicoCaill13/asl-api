@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { Frequency, PrismaClient, Role, Utility } from '@prisma/client';
 import { coOwner } from './seeders/coOwner';
 import * as bcrypt from 'bcrypt';
 import { contracts } from './seeders/contracts';
@@ -42,8 +42,7 @@ async function main() {
         phone: element.phone,
         officeId: element.officeId,
         password: passwordDefault,
-        acquisitionDate: element.acquisitionDate
-
+        acquisitionDate: element.acquisitionDate,
       },
     });
   }
@@ -55,8 +54,8 @@ async function main() {
       update: {},
       create: {
         name: contract.name,
-        utility: contract.utility,
-        frequency: contract.frequency,
+        utility: contract.utility as Utility,
+        frequency: contract.frequency as Frequency,
         lastPaymentDate: contract.lastPaymentDate,
         amount: contract.amount,
       },

@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, IsInt, IsOptional, IsNumber, IsEnum, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { Frequency } from '@prisma/client';
+import { Frequency, Utility } from '@prisma/client';
 
 export class CreateContractDto {
   @IsNotEmpty()
@@ -9,10 +9,10 @@ export class CreateContractDto {
   @ApiProperty()
   name: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty()
-  utility: string;
+  @IsOptional()
+  @ApiProperty({ enum: Utility })
+  @IsEnum(Utility)
+  utility: Utility;
 
   @IsOptional()
   @IsEnum(Frequency)
@@ -38,5 +38,5 @@ export class CreateContractDto {
   @IsDate()
   @Type(() => Date)
   @ApiProperty()
-  lastPaymentDate?: Date;
+  paymentDate?: Date;
 }

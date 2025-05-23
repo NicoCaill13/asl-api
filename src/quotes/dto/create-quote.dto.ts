@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
-import { QuoteStatus } from '@prisma/client';
+import { QuoteStatus, Utility } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -24,4 +24,9 @@ export class CreateQuoteDto {
   @IsEnum(QuoteStatus)
   @ApiProperty({ enum: [QuoteStatus] })
   status?: QuoteStatus;
+
+  @IsOptional()
+  @ApiProperty({ enum: Utility })
+  @IsEnum(Utility)
+  utility: Utility;
 }

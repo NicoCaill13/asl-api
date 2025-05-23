@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, StreamableFile } from '@nestjs/common';
 import { Response } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Quote, QuoteStatus } from '@prisma/client';
+import { Prisma, Quote, QuoteStatus, Utility } from '@prisma/client';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { existsSync, mkdirSync, writeFileSync, readFileSync, createReadStream } from 'fs';
 import { join } from 'path';
@@ -20,6 +20,7 @@ export class QuotesService {
     return this.prisma.quote.create({
       data: {
         ...data,
+        utility: data.utility as Utility | undefined,
         filePath,
         status: data.status || 'PENDING',
       },
