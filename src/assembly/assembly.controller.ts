@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Res,
@@ -32,6 +33,8 @@ import { OfficeMember } from 'src/auth/role/role.decorator';
 import { SendAssemblyDto } from './dto/send-assembly.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { assemblyService } from './assembly.service';
+import { UpdateAssemblyDto } from './dto/update-assembly.dto';
+import { Assembly } from '@prisma/client';
 
 @ApiTags('Assembly')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -44,7 +47,7 @@ export class AssemblyController {
   }
 
   @Post('send')
-  @ApiOperation({ summary: 'Créer et envoyer une convocation' })
+  @ApiOperation({ summary: 'create and send a convocation' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })
   @ApiBody({ type: SendAssemblyDto })
@@ -108,7 +111,7 @@ export class AssemblyController {
   }
 
   @Get('assembly/:id')
-  @ApiOperation({ summary: 'Récupérer une convocation envoyée' })
+  @ApiOperation({ summary: 'Get one convocation' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })
   @HttpCode(200)
@@ -131,7 +134,7 @@ export class AssemblyController {
   }
 
   @Delete('assembly/:id')
-  @ApiOperation({ summary: 'Supprimer une convocation envoyée' })
+  @ApiOperation({ summary: 'delete a convocation' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })
   @HttpCode(200)
@@ -144,7 +147,7 @@ export class AssemblyController {
   }
 
   @Put('assembly/:id')
-  @ApiOperation({ summary: 'Mettre à jour une convocation envoyée' })
+  @ApiOperation({ summary: 'update a convocation' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })
   @HttpCode(200)
@@ -152,7 +155,19 @@ export class AssemblyController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   @ApiOkResponse({ status: 200, description: 'Mise à jour réussie' })
-  update(@Param('id') id: number, @Body() dto: SendAssemblyDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async update(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File): Promise<Assembly> {
+    if (!file) {
+      throw new BadRequestException('Fichier manquant.');
+    }
+
+    const filePath = await this.assemblyService.storeFile(file, 'assemblee');
+
+    // ✅ On crée manuellement l'objet DTO
+    const dto: UpdateAssemblyDto = { filePath };
+
+    console.log('DTO prêt à enregistrer :', dto);
+
     return this.assemblyService.updateAssembly(id, dto);
   }
 }

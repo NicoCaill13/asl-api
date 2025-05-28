@@ -11,6 +11,8 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
@@ -19,15 +21,16 @@ import { OfficeMember } from 'src/auth/role/role.decorator';
 import { OfficeMemberGuard } from 'src/auth/role/role.guard';
 
 import { FundCallService } from './fund-call.service';
-import { SendFundCallDto } from './dto/fund-call.dto';
+import { SendFundCallDto } from './dto/create-fund-call.dto';
 
 @ApiTags('FundCalls')
-@Controller('fund-calls')
+@UsePipes(new ValidationPipe({ transform: true }))
+@Controller('')
 export class FundCallController {
   constructor(private readonly fundCallService: FundCallService) {}
 
   @Post('fund-call')
-  @ApiOperation({ summary: 'Créer et envoyer une convocation' })
+  @ApiOperation({ summary: 'Create and send a Fund Call' })
   @ApiUnauthorizedResponse({ status: 401, description: 'Non authentifié' })
   @ApiForbiddenResponse({ status: 403, description: 'Accès refusé' })
   @ApiBody({ type: SendFundCallDto })
@@ -35,20 +38,22 @@ export class FundCallController {
   @OfficeMember(true)
   @UseGuards(JwtAuthGuard, OfficeMemberGuard)
   @ApiBearerAuth()
-  @UseInterceptors(
-    FileInterceptor('file', {
-      fileFilter: (req, file, callback) => {
-        // Vérifie si le fichier est un PDF
-        if (file.mimetype === 'application/pdf') {
-          callback(null, true);
-        } else {
-          callback(new BadRequestException('Only PDF files are allowed!'), false);
-        }
-      },
-    })
-  )
-  create(@UploadedFile() file: Express.Multer.File, @Body() Dto: SendFundCallDto) {
-    return this.fundCallService.create(Dto, file);
+  async create(@Body() Dto: any) {
+    console.log('DTO reçu:', Dto);
+    const parsedDto = {
+      ...Dto,
+      date: Dto.date ? new Date(Dto.date) : undefined,
+      amount: Dto.amount ? Number(Dto.amount) : undefined,
+      // Utilise numberOfPayments si c'est le champ attendu par le service/prisma !
+      installment: Dto.installment ? Number(Dto.installment) : undefined,
+      // Corrige ici si tu changes le nom du champ !
+      coOwners: Array.isArray(Dto.coOwners) ? Dto.coOwners : typeof Dto.coOwners === 'string' ? JSON.parse(Dto.coOwners) : [],
+      reference: Dto.reference ? String(Dto.reference) : undefined,
+      status: Dto.status ? String(Dto.status) : undefined,
+      message: Dto.message ? String(Dto.message) : undefined,
+    };
+
+    return this.fundCallService.create(parsedDto);
   }
 
   @Get('fund-calls')

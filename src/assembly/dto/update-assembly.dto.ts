@@ -1,13 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString } from 'class-validator';
 
 export class UpdateAssemblyDto {
-  @IsDate()
-  @Type(() => Date)
-  @ApiProperty()
-  date: Date;
-
+  @IsOptional()
   @IsString()
-  message: string;
+  @ApiProperty({ description: 'Chemin du fichier PDF associé' })
+  filePath?: string;
 }

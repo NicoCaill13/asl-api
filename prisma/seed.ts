@@ -18,8 +18,113 @@ async function main() {
     },
   });
 
-  const roundsOfHashing = parseInt(process.env.ROUNDS_OF_HASHING!);
+  const fakeOwners = [
+    {
+      id: 1,
+      name: 'Lot 101',
+      emailMain: 'demo1@asl.com',
+      address: 'Default Address',
+      lotNumber: 101,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 2,
+      name: 'Lot 102',
+      emailMain: 'demo2@asl.com',
+      address: 'Default Address',
+      lotNumber: 102,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 3,
+      name: 'Lot 103',
+      emailMain: 'demo3@asl.com',
+      address: 'Default Address',
+      lotNumber: 103,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 4,
+      name: 'Lot 104',
+      emailMain: 'demo4@asl.com',
+      address: 'Default Address',
+      lotNumber: 104,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 5,
+      name: 'Lot 105',
+      emailMain: 'demo5@asl.com',
+      address: 'Default Address',
+      lotNumber: 105,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 6,
+      name: 'Lot 106',
+      emailMain: 'demo6@asl.com',
+      address: 'Default Address',
+      lotNumber: 106,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+    {
+      id: 7,
+      name: 'Lot 107',
+      emailMain: 'demo7@asl.com',
+      address: 'Default Address',
+      lotNumber: 107,
+      bankBalance: 0,
+      city: 'Default City',
+      zipCode: '00000',
+      phone: '000-000-0000',
+      officeId: 1,
+      acquisitionDate: new Date(),
+    },
+  ];
 
+  for (const owner of fakeOwners) {
+    await prisma.coOwnership.upsert({
+      where: { emailMain: owner.emailMain },
+      update: {},
+      create: owner,
+    });
+  }
+}
+
+const roundsOfHashing = parseInt(process.env.ROUNDS_OF_HASHING!);
+
+async function handleCoOwners() {
+  const roundsOfHashing = parseInt(process.env.ROUNDS_OF_HASHING!);
   const passwordDefault = await bcrypt.hash(process.env.PASSWORD_DEFAULT!, roundsOfHashing);
 
   for (let index = 0; index < coOwner.length; index++) {
@@ -46,6 +151,10 @@ async function main() {
       },
     });
   }
+}
+
+async function runSeed() {
+  await handleCoOwners();
 
   for (let index = 0; index < contracts.length; index++) {
     const contract = contracts[index];
@@ -61,12 +170,15 @@ async function main() {
       },
     });
   }
+
+  await main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
 }
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+
+runSeed();

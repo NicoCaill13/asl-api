@@ -20,6 +20,7 @@ import { QuotesModule } from './quotes/quotes.module';
 import { FileUploadModule } from './utils/file-upload.module';
 import { providePrismaClientExceptionFilter } from 'nestjs-prisma';
 import { AssemblyModule } from './assembly/assembly.module';
+import { FundCallModule } from './fund-calls/fund-call.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AssemblyModule } from './assembly/assembly.module';
     QuotesModule,
     FileUploadModule,
     AssemblyModule,
+    FundCallModule,
   ],
   controllers: [AppController, InvoicesController, ContractsController, QuotesController],
   providers: [

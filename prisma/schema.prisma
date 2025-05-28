@@ -113,6 +113,7 @@ model FundCall {
   id              Int                   @id @default(autoincrement())
   date            DateTime
   amount          Float
+  reference       String
   statut          FundCallStatut        @default(PENDING)
   payments        FundCallPayment[]
 }
@@ -128,6 +129,7 @@ model FundCallPayment {
   installment   Int           
   amountPaid    Float
   paidAt        DateTime
+  dueDate      DateTime?
 
   @@unique([fundCallId, coOwnershipId, installment]) 
 }

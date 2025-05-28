@@ -21,7 +21,7 @@ export class OfficesController {
     return this.officesService.create(createOfficeDto);
   }
 
-  @Get()
+  @Get('')
   @ApiOperation({ summary: 'Find all Offices' })
   @ApiResponse({
     status: 200,

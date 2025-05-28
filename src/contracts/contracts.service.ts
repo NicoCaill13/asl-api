@@ -100,7 +100,7 @@ export class ContractsService {
   async update(id: number, data: UpdateContractDto): Promise<Contract> {
     return this.prisma.contract.update({
       where: { id },
-      data,
+      data
     });
   }
 

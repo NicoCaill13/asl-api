@@ -12,4 +12,4 @@ import { FundCallService } from './fund-call.service';
   exports: [FundCallService],
 })
 @Module({})
-export class QuotesModule {}
+export class FundCallModule {}

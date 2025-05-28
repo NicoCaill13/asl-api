@@ -126,6 +126,7 @@ export class assemblyService {
             coOwnership: {
               select: {
                 emailMain: true,
+                name: true,
               },
             },
           },
@@ -141,7 +142,7 @@ export class assemblyService {
         participants: {
           include: {
             coOwnership: {
-              select: { emailMain: true },
+              select: { emailMain: true, name: true },
             },
           },
         },
@@ -154,6 +155,7 @@ export class assemblyService {
   }
 
   async updateAssembly(id: number, dto: UpdateAssemblyDto) {
+    console.log('DATA À METTRE À JOUR 👉', dto); // ← Ajoute ceci
     return this.prisma.assembly.update({
       where: { id },
       data: dto,
@@ -175,5 +177,9 @@ export class assemblyService {
 
     const fileStream = createReadStream(filePath);
     return new StreamableFile(fileStream);
+  }
+
+  async storeFile(file: Express.Multer.File, folder: string): Promise<string> {
+    return this.fileUploadService.uploadFile(file, folder);
   }
 }

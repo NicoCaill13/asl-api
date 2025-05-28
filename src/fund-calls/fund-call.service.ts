@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import * as nodemailer from 'nodemailer';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SendFundCallDto } from './dto/create-fund-call.dto';
 
 @Injectable()
 export class FundCallService {
@@ -31,29 +32,60 @@ export class FundCallService {
       }
     });
   }
+  async create(dto: SendFundCallDto): Promise<{ success: boolean }> {
+    const { amount, date, installment, coOwners, message, reference, status } = dto;
 
-  async create(dto: any, file: Express.Multer.File): Promise<{ success: boolean; messageId: string }> {
-    try {
-      const info = await this.transporter.sendMail({
-        from: `"ASL" <${process.env.SMTP_USER}>`,
-        to: dto.email,
-        subject: 'Appel de fonds',
-        html: dto.message || 'Vous trouverez en pièce jointe l’appel de fonds.',
-        attachments: [
-          {
-            filename: file.originalname,
-            content: file.buffer,
-          },
-        ],
-      });
-      return {
-        success: true,
-        messageId: info.messageId,
-      };
-    } catch (err) {
-      console.error('Erreur d’envoi :', err);
-      throw new InternalServerErrorException('Impossible d’envoyer l’appel de fonds');
+    // Récupère les co-pros dans la BDD
+    const coOwnersEntities = await this.prisma.coOwnership.findMany({
+      where: { emailMain: { in: coOwners } },
+      select: { id: true, emailMain: true, name: true },
+    });
+    if (coOwnersEntities.length !== coOwners.length) {
+      throw new BadRequestException("Un ou plusieurs copropriétaires n'existent pas");
     }
+
+    // Génère les échéances (mensuelles à partir de la date de départ)
+    const dueDates = Array.from({ length: installment }, (_, i) => {
+      const d = new Date(date);
+      d.setMonth(d.getMonth() + i);
+      return d;
+    });
+
+    // Création de l'appel de fonds principal + tous les paiements attendus
+    await this.prisma.fundCall.create({
+      data: {
+        date: new Date(date),
+        amount,
+        statut: status ?? 'PENDING',
+        reference,
+        payments: {
+          create: coOwnersEntities.flatMap((co) =>
+            dueDates.map((due, i) => ({
+              installment: i + 1,
+              amountPaid: 0,
+              paidAt: due, // Obligatoire ! Pas de null ici !
+              dueDate: due, // Nullable
+              coOwnership: {
+                connect: { id: co.id },
+              },
+            }))
+          ),
+        },
+      },
+      include: { payments: true },
+    });
+
+    // Envoi individuel des mails
+    for (const co of coOwnersEntities) {
+      await this.transporter.sendMail({
+        from: `"ASL" <${process.env.SMTP_USER}>`,
+        to: co.emailMain,
+        subject: `Nouvel appel de fonds - Réf. ${reference}`,
+        html: `<p>Bonjour ${co.name ?? ''},<br>${message}</p>`,
+      });
+    }
+
+    return { success: true };
   }
 
   async findAll() {
