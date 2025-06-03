@@ -69,7 +69,7 @@ export class CoOwnersController {
   @HttpCode(200)
   @Self(true)
   @OfficeMember(true)
-  @UseGuards(JwtAuthGuard, SelfGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updateCoOwnerDto: UpdateCoOwnerDto) {
     return this.coOwnersService.update(+id, updateCoOwnerDto);
